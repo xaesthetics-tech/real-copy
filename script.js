@@ -401,7 +401,7 @@ function setupEnquiryForm() {
 
   if (!form || !status) return;
 
-  form.addEventListener("submit", event => {
+  form.addEventListener("submit", async event => {
     event.preventDefault();
     status.hidden = true;
 
@@ -424,15 +424,54 @@ function setupEnquiryForm() {
       return;
     }
 
-    status.textContent =
-      "Thank you — your enquiry has been captured in this browser " +
-      "demo only. It has not been sent to the salon. Connect a secure " +
-      "form backend to receive real enquiries.";
+    const formData = new FormData(form);
 
-    status.hidden = false;
+const name = formData.get("name") || "";
+const phone = formData.get("phone") || "";
+const email = formData.get("email") || "";
+const service = formData.get("service") || "";
+const date = formData.get("date") || "";
+const message = formData.get("message") || "";
 
-    form.reset();
-    setupDateMinimum();
+/* Get the salon's WhatsApp number */
+const { data: salonData, error: salonError } = await db
+  .from("salons")
+  .select("whatsapp")
+  .eq("salon_code", SALON_CODE)
+  .single();
+
+if (salonError || !salonData || !salonData.whatsapp) {
+  status.textContent =
+    "We could not open WhatsApp right now. Please contact the salon directly.";
+
+  status.hidden = false;
+  return;
+}
+
+/* Convert saved WhatsApp link/number into a WhatsApp number */
+let whatsappNumber = salonData.whatsapp
+  .replace(/^https?:\/\/(www\.)?wa\.me\//, "")
+  .replace(/\D/g, "");
+
+const whatsappMessage =
+  "New Enquiry - " + SALON_CODE + "\n\n" +
+  "Name: " + name + "\n" +
+  "Phone: " + phone + "\n" +
+  "Email: " + email + "\n" +
+  "Service: " + service + "\n" +
+  "Preferred Date: " + date + "\n" +
+  "Message: " + message;
+
+const whatsappUrl =
+  "https://wa.me/" +
+  whatsappNumber +
+  "?text=" +
+  encodeURIComponent(whatsappMessage);
+
+window.open(whatsappUrl, "_blank", "noopener");
+
+form.reset();
+setupDateMinimum();
   });
 }
 
