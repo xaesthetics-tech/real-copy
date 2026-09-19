@@ -687,17 +687,6 @@ document.addEventListener("DOMContentLoaded", () => {
   setupEnquiryForm();
   setupFooterYear();
 
-  const originalRouteToHash = routeToHash;
-
-routeToHash = function () {
-  document.body.setAttribute(
-    "data-router-test",
-    window.location.hash || "#home"
-  );
-
-  originalRouteToHash();
-};
-
-routeToHash();
+  routeToHash();
 
 window.addEventListener("hashchange", routeToHash);
