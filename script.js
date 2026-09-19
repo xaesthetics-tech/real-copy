@@ -691,10 +691,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
   window.addEventListener("hashchange", routeToHash);
 });
-/* -------------------------------
-   ENQUIRY FORM SAFETY ACTIVATION
--------------------------------- */
-
-document.addEventListener("DOMContentLoaded", () => {
-  setupEnquiryForm();
-});
